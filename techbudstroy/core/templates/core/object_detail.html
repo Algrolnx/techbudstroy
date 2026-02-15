@@ -1,0 +1,93 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ object.title }} - ТехБуд-Строй{% endblock %}
+
+{% block header %}Деталі об'єкта{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card card-custom p-4 h-100">
+            <h5 class="card-title mb-3">{{ object.title }}</h5>
+            <p class="text-muted"><i class="fas fa-map-marker-alt text-danger"></i> {{ object.address }}</p>
+            <hr>
+            <p><strong>Замовник:</strong><br> {{ object.client.name }}</p>
+            <p><strong>Компанія-виконавець:</strong><br> {{ object.company.name }}</p>
+            <p><strong>Площа:</strong> {{ object.area }} м²</p>
+            <div class="d-grid gap-2 mt-4">
+                <button class="btn btn-outline-primary">Редагувати</button>
+                <button class="btn btn-outline-danger">Архівувати</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 mb-4">
+        <div class="card card-custom p-4 h-100">
+            <ul class="nav nav-tabs mb-3" id="objectTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#stages"
+                        type="button">Етапи</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#materials"
+                        type="button">Матеріали</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#finance"
+                        type="button">Фінанси</button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="stages">
+                    <div class="d-flex justify-content-end mb-2">
+                        <button class="btn btn-sm btn-success"><i class="fas fa-plus"></i> Етап</button>
+                    </div>
+                    {% for stage in object.constructionstage_set.all %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ stage.name }}</strong>
+                            <span>{{ stage.progress_percent }}%</span>
+                        </div>
+                        <div class="progress mt-1" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                style="width: {{ stage.progress_percent }}%"></div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">Етапи не визначені.</p>
+                    {% endfor %}
+                </div>
+
+                <div class="tab-pane fade" id="materials">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Матеріал</th>
+                                <th>Кількість</th>
+                                <th>Дата</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for usage in object.materialusage_set.all %}
+                            <tr>
+                                <td>{{ usage.material.name }}</td>
+                                <td>{{ usage.quantity }} {{ usage.material.unit }}</td>
+                                <td>{{ usage.date_used }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">Матеріали ще не використовувались</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="finance">
+                    <p class="text-muted">Інформація про договір та платежі підтягується через Contracts...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

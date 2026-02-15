@@ -1,0 +1,58 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Договори - ТехБуд-Строй{% endblock %}
+
+{% block header %}Фінанси та Договори{% endblock %}
+
+{% block content %}
+<div class="card card-custom p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="card-title">Реєстр договорів</h5>
+        <button class="btn btn-warning text-white"><i class="fas fa-file-signature"></i> Новий договір</button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover table-custom">
+            <thead>
+                <tr>
+                    <th>№ Договору</th>
+                    <th>Замовник</th>
+                    <th>Об'єкт</th>
+                    <th>Сума</th>
+                    <th>Статус</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contract in contracts %}
+                <tr>
+                    <td class="fw-bold">{{ contract.contract_number }}</td>
+                    <td>{{ contract.client.name }}</td>
+                    <td>{{ contract.construction_object.title }}</td>
+                    <td class="fw-bold">{{ contract.total_amount }} грн</td>
+                    <td>
+                        {% if contract.status == 'Active' %}
+                        <span class="badge bg-success">Активний</span>
+                        {% elif contract.status == 'Completed' %}
+                        <span class="badge bg-secondary">Завершено</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">{{ contract.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary"><i
+                                class="fas fa-file-invoice-dollar"></i></button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">
+                        Договорів не знайдено.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

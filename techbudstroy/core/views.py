@@ -1,5 +1,4 @@
 from django.shortcuts import render, get_object_or_404
-from django.shortcuts import sum
 from .models import (
     ConstructionObject, Material,
     Employee, Contract
@@ -7,7 +6,7 @@ from .models import (
 
 def dashboard(request):
     total_objects = ConstructionObject.objects.count()
-    active_contracts = contract.objects.filter(status='active').count()
+    active_contracts = Contract.objects.filter(status='Active').count()
 
     context = {
         'total_objects': total_objects,
@@ -21,7 +20,7 @@ def object_list(request):
 
 def object_detail(request, pk):
     obj = get_object_or_404(ConstructionObject, pk=pk)
-    return render(request, 'core/objects_detail.html', {'obj': obj})
+    return render(request, 'core/object_detail.html', {'object': obj})
 
 def material_list(request):
     materials = Material.objects.all()
