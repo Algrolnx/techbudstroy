@@ -1,3 +1,37 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.shortcuts import sum
+from .models import (
+    ConstructionObject, Material,
+    Employee, Contract
+)
 
-# Create your views here.
+def dashboard(request):
+    total_objects = ConstructionObject.objects.count()
+    active_contracts = contract.objects.filter(status='active').count()
+
+    context = {
+        'total_objects': total_objects,
+        'active_contracts': active_contracts,
+    }
+    return render(request, 'core/dashboard.html', context)
+
+def object_list(request):
+    objects = ConstructionObject.objects.all()
+    return render(request, 'core/object_list.html', {'objects': objects})
+
+def object_detail(request, pk):
+    obj = get_object_or_404(ConstructionObject, pk=pk)
+    return render(request, 'core/objects_detail.html', {'obj': obj})
+
+def material_list(request):
+    materials = Material.objects.all()
+    return render(request, 'core/material_list.html', {'materials': materials})
+
+def employee_list(request):
+    employees = Employee.objects.all()
+    return render(request, 'core/employee_list.html', {'employees': employees})
+
+def contract_list(request):
+    contracts = Contract.objects.all()
+    return render(request, 'core/contract_list.html', {'contracts': contracts})
+    
