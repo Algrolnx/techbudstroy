@@ -108,7 +108,7 @@ class Payment(models.Model):
     contract = models.ForeignKey(Contract, on_delete=models.CASCADE )
 
     def __str__(self):
-        return f'{self.payment_type_display()} - {self.amount}'
+        return f'{self.get_payment_type_display()} - {self.amount}'
 
 class AuditLog(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True)
