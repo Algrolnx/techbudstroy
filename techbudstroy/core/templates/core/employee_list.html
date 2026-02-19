@@ -12,16 +12,18 @@
             <div class="dropdown d-inline-block">
                 <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
                     data-bs-toggle="dropdown">
-                    Фільтр: Всі бригади
+                    Фільтр: {% if current_brigade %}{{ current_brigade.name }}{% else %}Всі бригади{% endif %}
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Всі</a></li>
-                    <li><a class="dropdown-item" href="#">Бригада №1</a></li>
-                    <li><a class="dropdown-item" href="#">Електрики</a></li>
+                    <li><a class="dropdown-item" href="{% url 'employee_list' %}">Всі</a></li>
+                    {% for brigade in brigades %}
+                    <li><a class="dropdown-item" href="?brigade={{ brigade.id }}">{{ brigade.name }}</a></li>
+                    {% endfor %}
                 </ul>
             </div>
         </div>
-        <button class="btn btn-warning text-white"><i class="fas fa-user-plus"></i> Додати працівника</button>
+        <a href="{% url 'admin:core_employee_add' %}" class="btn btn-warning text-white"><i
+                class="fas fa-user-plus"></i> Додати працівника</a>
     </div>
 
     <div class="table-responsive">

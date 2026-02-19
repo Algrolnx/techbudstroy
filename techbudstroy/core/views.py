@@ -3,7 +3,7 @@ from django.db.models import Sum
 from django.db.models.functions import TruncMonth, TruncWeek, TruncDay
 from .models import (
     ConstructionObject, Material,
-    Employee, Contract, Payment
+    Employee, Contract, Payment, Brigade
 )
 
 def dashboard(request):
@@ -72,10 +72,23 @@ def material_list(request):
     return render(request, 'core/material_list.html', {'materials': materials})
 
 def employee_list(request):
-    employees = Employee.objects.all()
-    return render(request, 'core/employee_list.html', {'employees': employees})
+    brigade_id = request.GET.get('brigade')
+    if brigade_id:
+        employees = Employee.objects.filter(brigade_id=brigade_id)
+        current_brigade = Brigade.objects.get(id=brigade_id)
+    else:
+        employees = Employee.objects.all()
+        current_brigade = None
+        
+    brigades = Brigade.objects.all()
+    
+    context = {
+        'employees': employees,
+        'brigades': brigades,
+        'current_brigade': current_brigade
+    }
+    return render(request, 'core/employee_list.html', context)
 
 def contract_list(request):
     contracts = Contract.objects.all()
     return render(request, 'core/contract_list.html', {'contracts': contracts})
-    
