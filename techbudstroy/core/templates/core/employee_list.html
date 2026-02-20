@@ -51,8 +51,7 @@
                     </td>
                     <td>{{ employee.salary }} грн</td>
                     <td>
-                        <a href="{% url 'admin:core_employee_change' employee.id %}"
-                            class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></a>
+                        <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
                     </td>
                 </tr>
                 {% empty %}

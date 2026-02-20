@@ -15,10 +15,8 @@
             <p><strong>Компанія-виконавець:</strong><br> {{ object.company.name }}</p>
             <p><strong>Площа:</strong> {{ object.area }} м²</p>
             <div class="d-grid gap-2 mt-4">
-                <a href="{% url 'admin:core_constructionobject_change' object.pk %}"
-                    class="btn btn-outline-primary">Редагувати</a>
-                <a href="{% url 'admin:core_constructionobject_delete' object.pk %}"
-                    class="btn btn-outline-danger">Архівувати</a>
+                <button class="btn btn-outline-primary">Редагувати</button>
+                <button class="btn btn-outline-danger">Архівувати</button>
             </div>
         </div>
     </div>
@@ -43,20 +41,15 @@
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="stages">
                     <div class="d-flex justify-content-end mb-2">
-                        <a href="{% url 'admin:core_constructionstage_add' %}"
-                            class="btn btn-sm btn-success text-white"><i class="fas fa-plus"></i> Етап</a>
+                        <button class="btn btn-sm btn-success"><i class="fas fa-plus"></i> Етап</button>
                     </div>
                     {% for stage in object.constructionstage_set.all %}
                     <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between">
                             <strong>{{ stage.name }}</strong>
-                            <div>
-                                <span class="me-2">{{ stage.progress_percent }}%</span>
-                                <a href="{% url 'admin:core_constructionstage_change' stage.id %}" class="text-muted"><i
-                                        class="fas fa-edit"></i></a>
-                            </div>
+                            <span>{{ stage.progress_percent }}%</span>
                         </div>
-                        <div class="progress mt-1 progress-sm">
+                        <div class="progress mt-1" style="height: 10px;">
                             <div class="progress-bar bg-success" role="progressbar"
                                 style="width: {{ stage.progress_percent }}%"></div>
                         </div>
@@ -67,17 +60,12 @@
                 </div>
 
                 <div class="tab-pane fade" id="materials">
-                    <div class="d-flex justify-content-end mb-2">
-                        <a href="{% url 'admin:core_materialusage_add' %}" class="btn btn-sm btn-success text-white"><i
-                                class="fas fa-plus"></i> Використання</a>
-                    </div>
                     <table class="table table-sm">
                         <thead>
                             <tr>
                                 <th>Матеріал</th>
                                 <th>Кількість</th>
                                 <th>Дата</th>
-                                <th>Дії</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -86,86 +74,17 @@
                                 <td>{{ usage.material.name }}</td>
                                 <td>{{ usage.quantity }} {{ usage.material.unit }}</td>
                                 <td>{{ usage.date_used }}</td>
-                                <td><a href="{% url 'admin:core_materialusage_change' usage.id %}"
-                                        class="btn btn-xs btn-outline-secondary"><i class="fas fa-edit"></i></a></td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="4" class="text-center text-muted">Матеріали ще не використовувались</td>
+                                <td colspan="3" class="text-center text-muted">Матеріали ще не використовувались</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 <div class="tab-pane fade" id="finance">
-                    <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
-                        <h6 class="mb-0">Договори по об'єкту</h6>
-                        <a href="{% url 'admin:core_contract_add' %}" class="btn btn-xs btn-outline-primary"><i
-                                class="fas fa-plus"></i> Додати договір</a>
-                    </div>
-
-                    <table class="table table-sm table-bordered">
-                        <thead class="table-light">
-                            <tr>
-                                <th>№</th>
-                                <th>Статус</th>
-                                <th>Сума</th>
-                                <th>Дії</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for contract in object.contract_set.all %}
-                            <tr>
-                                <td>{{ contract.contract_number }}</td>
-                                <td>{{ contract.status }}</td>
-                                <td>{{ contract.total_amount }} грн</td>
-                                <td><a href="{% url 'admin:core_contract_change' contract.id %}"
-                                        class="btn btn-xs btn-outline-primary">Переглянути</a></td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center text-muted">Немає договорів</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-
-                    <h6 class="mt-4 mb-3">Історія платежів (через договори)</h6>
-                    <table class="table table-sm table-hover">
-                        <thead>
-                            <tr>
-                                <th>Дата</th>
-                                <th>Тип</th>
-                                <th>Сума</th>
-                                <th>Договір</th>
-                                <th>Дії</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for contract in object.contract_set.all %}
-                            {% for payment in contract.payment_set.all %}
-                            <tr>
-                                <td>{{ payment.payment_date }}</td>
-                                <td>
-                                    {% if payment.payment_type == 'IN' %}
-                                    <span class="text-success"><i class="fas fa-arrow-down"></i> Надходження</span>
-                                    {% else %}
-                                    <span class="text-danger"><i class="fas fa-arrow-up"></i> Витрата</span>
-                                    {% endif %}
-                                </td>
-                                <td class="fw-bold">{{ payment.amount }}</td>
-                                <td>{{ contract.contract_number }}</td>
-                                <td><a href="{% url 'admin:core_payment_change' payment.id %}"
-                                        class="btn btn-xs btn-outline-secondary"><i class="fas fa-edit"></i></a></td>
-                            </tr>
-                            {% endfor %}
-                            {% empty %}
-                            <tr>
-                                <td colspan="5" class="text-center text-muted">Платежів не знайдено</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <p class="text-muted">Інформація про договір та платежі підтягується через Contracts...</p>
                 </div>
             </div>
         </div>
