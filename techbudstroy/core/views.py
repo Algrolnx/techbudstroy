@@ -60,11 +60,16 @@ def dashboard(request):
     return render(request, 'core/dashboard.html', context)
 
 def object_list(request):
-    objects = ConstructionObject.objects.all()
+    objects = ConstructionObject.objects.select_related('client').all()
     return render(request, 'core/object_list.html', {'objects': objects})
 
 def object_detail(request, pk):
-    obj = get_object_or_404(ConstructionObject, pk=pk)
+    queryset = ConstructionObject.objects.prefetch_related(
+        'constructionstage_set', 
+        'materialusage_set__material',
+        'contract_set'
+    )
+    obj = get_object_or_404(queryset, pk=pk)
     return render(request, 'core/object_detail.html', {'object': obj})
 
 def material_list(request):
@@ -74,10 +79,10 @@ def material_list(request):
 def employee_list(request):
     brigade_id = request.GET.get('brigade')
     if brigade_id:
-        employees = Employee.objects.filter(brigade_id=brigade_id)
+        employees = Employee.objects.select_related('brigade').filter(brigade_id=brigade_id)
         current_brigade = Brigade.objects.get(id=brigade_id)
     else:
-        employees = Employee.objects.all()
+        employees = Employee.objects.select_related('brigade').all()
         current_brigade = None
         
     brigades = Brigade.objects.all()
@@ -90,5 +95,5 @@ def employee_list(request):
     return render(request, 'core/employee_list.html', context)
 
 def contract_list(request):
-    contracts = Contract.objects.all()
+    contracts = Contract.objects.select_related('client', 'construction_object').all()
     return render(request, 'core/contract_list.html', {'contracts': contracts})
