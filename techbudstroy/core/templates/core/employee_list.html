@@ -1,18 +1,14 @@
 {% extends 'core/base.html' %}
-
 {% block title %}Працівники - ТехБуд-Строй{% endblock %}
-
 {% block header %}Кадри{% endblock %}
-
 {% block content %}
-<div class="card card-custom p-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="card card-custom p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h5 class="card-title d-inline-block me-3">Список працівників</h5>
+            <h5 class="d-inline-block mb-0 me-2">Список працівників</h5>
             <div class="dropdown d-inline-block">
-                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
-                    data-bs-toggle="dropdown">
-                    Фільтр: {% if current_brigade %}{{ current_brigade.name }}{% else %}Всі бригади{% endif %}
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    {% if current_brigade %}{{ current_brigade.name }}{% else %}Всі бригади{% endif %}
                 </button>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="{% url 'employee_list' %}">Всі</a></li>
@@ -22,48 +18,37 @@
                 </ul>
             </div>
         </div>
-        <a href="{% url 'admin:core_employee_add' %}" class="btn btn-warning text-white"><i
-                class="fas fa-user-plus"></i> Додати працівника</a>
+        <a href="{% url 'admin:core_employee_add' %}" class="btn btn-sm btn-warning text-white">+ Додати</a>
     </div>
-
-    <div class="table-responsive">
-        <table class="table table-hover table-custom">
-            <thead>
-                <tr>
-                    <th>ПІБ</th>
-                    <th>Посада</th>
-                    <th>Бригада</th>
-                    <th>Зарплата</th>
-                    <th>Дії</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for employee in employees %}
-                <tr>
-                    <td class="fw-bold">{{ employee.full_name }}</td>
-                    <td>{{ employee.position }}</td>
-                    <td>
-                        {% if employee.brigade %}
-                        <span class="badge bg-info text-dark">{{ employee.brigade.name }}</span>
-                        {% else %}
-                        <span class="text-muted">-</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ employee.salary }} грн</td>
-                    <td>
-                        <a href="{% url 'admin:core_employee_change' employee.id %}"
-                            class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="text-center text-muted py-4">
-                        Немає працівників.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <table class="table table-hover table-sm">
+        <thead>
+            <tr>
+                <th>ПІБ</th>
+                <th>Посада</th>
+                <th>Бригада</th>
+                <th>Зарплата</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in employees %}
+            <tr>
+                <td><strong>{{ employee.full_name }}</strong></td>
+                <td>{{ employee.position }}</td>
+                <td>
+                    {% if employee.brigade %}<span class="badge bg-info text-dark">{{ employee.brigade.name }}</span>
+                    {% else %}<span class="text-muted">-</span>{% endif %}
+                </td>
+                <td>{{ employee.salary }} грн</td>
+                <td><a href="{% url 'admin:core_employee_change' employee.id %}"
+                        class="btn btn-sm btn-outline-secondary">Ред.</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-muted py-3">Немає працівників.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

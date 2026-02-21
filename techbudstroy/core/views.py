@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.db.models.functions import TruncMonth, TruncWeek, TruncDay
 from .models import (
@@ -6,6 +7,7 @@ from .models import (
     Employee, Contract, Payment, Brigade
 )
 
+@login_required
 def dashboard(request):
     total_objects = ConstructionObject.objects.count()
     active_contracts = Contract.objects.filter(status='Active').count()
@@ -59,10 +61,12 @@ def dashboard(request):
     
     return render(request, 'core/dashboard.html', context)
 
+@login_required
 def object_list(request):
     objects = ConstructionObject.objects.select_related('client').all()
     return render(request, 'core/object_list.html', {'objects': objects})
 
+@login_required
 def object_detail(request, pk):
     queryset = ConstructionObject.objects.prefetch_related(
         'constructionstage_set', 
@@ -72,10 +76,12 @@ def object_detail(request, pk):
     obj = get_object_or_404(queryset, pk=pk)
     return render(request, 'core/object_detail.html', {'object': obj})
 
+@login_required
 def material_list(request):
     materials = Material.objects.all()
     return render(request, 'core/material_list.html', {'materials': materials})
 
+@login_required
 def employee_list(request):
     brigade_id = request.GET.get('brigade')
     if brigade_id:
@@ -94,6 +100,7 @@ def employee_list(request):
     }
     return render(request, 'core/employee_list.html', context)
 
+@login_required
 def contract_list(request):
     contracts = Contract.objects.select_related('client', 'construction_object').all()
     return render(request, 'core/contract_list.html', {'contracts': contracts})

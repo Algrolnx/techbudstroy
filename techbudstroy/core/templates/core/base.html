@@ -44,8 +44,11 @@
             <div class="container-fluid">
                 <span class="navbar-brand mb-0 h1">{% block header %}Панель керування{% endblock %}</span>
                 <div class="d-flex align-items-center">
-                    <span class="me-3">Привіт, Адмін</span>
-                    <button class="btn btn-outline-danger btn-sm">Вихід</button>
+                    <span class="me-3">Привіт, {{ user.username }}!</span>
+                    <form method="post" action="{% url 'logout' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Вихід</button>
+                    </form>
                 </div>
             </div>
         </nav>

@@ -1,50 +1,37 @@
 {% extends 'core/base.html' %}
-
-{% block title %} Об'єкти - ТехБуд-Строй {% endblock %}
-
-{% block header %} Об'єкти будівництва {% endblock %}
-
+{% block title %}Об'єкти - ТехБуд-Строй{% endblock %}
+{% block header %}Об'єкти будівництва{% endblock %}
 {% block content %}
-<div class="card card-custom p-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h5 class="card-title">Список поточних об'єктів</h5>
-        <a href="{% url 'admin:core_constructionobject_add' %}" class="btn btn-warning text-white"><i
-                class="fas fa-plus"></i> Додати об'єкт</a>
+<div class="card card-custom p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Список об'єктів</h5>
+        <a href="/admin/core/constructionobject/add/" class="btn btn-sm btn-warning text-white">+ Додати</a>
     </div>
-
-    <div class="table-responsive">
-        <table class="table table-hover table-custom">
-            <thead>
-                <tr>
-                    <th>Назва</th>
-                    <th>Адреса</th>
-                    <th>Статус</th>
-                    <th>Керівник</th>
-                    <th>Дії</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for obj in objects %}
-                <tr>
-                    <td class="fw-bold">{{ obj.title }}</td>
-                    <td><i class="fas fa-map-marker-alt text-danger me-1"></i>{{ obj.address }}</td>
-                    <td>{{ obj.client.name }}</td>
-                    <td>{{ obj.area }}</td>
-                    <td>
-                        <a href="{% url 'object_detail' obj.pk %}" class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-eye"></i> Деталі
-                        </a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="text-center text-muted py-4">
-                        Немає активних об'єктів. Додайте перший!
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <table class="table table-hover table-sm">
+        <thead>
+            <tr>
+                <th>Назва</th>
+                <th>Адреса</th>
+                <th>Замовник</th>
+                <th>Площа</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for obj in objects %}
+            <tr>
+                <td><strong>{{ obj.title }}</strong></td>
+                <td>{{ obj.address }}</td>
+                <td>{{ obj.client.name }}</td>
+                <td>{{ obj.area }} м²</td>
+                <td><a href="{% url 'object_detail' obj.pk %}" class="btn btn-sm btn-outline-primary">Деталі</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-muted py-3">Немає об'єктів.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}
