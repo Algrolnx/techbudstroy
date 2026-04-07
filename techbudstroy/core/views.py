@@ -1,10 +1,10 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Sum, F
 from django.db.models.functions import TruncMonth, TruncWeek, TruncDay
 from .models import (
     ConstructionObject, Material,
-    Employee, Contract, Payment, Brigade
+    Employee, Contract, Payment, Brigade, MaterialUsage
 )
 
 @login_required
@@ -104,3 +104,23 @@ def employee_list(request):
 def contract_list(request):
     contracts = Contract.objects.select_related('client', 'construction_object').all()
     return render(request, 'core/contract_list.html', {'contracts': contracts})
+
+@login_required
+def reports(request):
+    material_report = (
+        MaterialUsage.objects
+        .values(name=F('material__name'), unit=F('material__unit'))
+        .annotate(total_qty=Sum('quantity'))
+        .order_by('-total_qty')[:10]
+    )
+    from .models import Brigade
+    salary_report = (
+        Employee.objects
+        .values(brigade_name=F('brigade__name'))
+        .annotate(total_salary=Sum('salary'))
+        .order_by('-total_salary')
+    )
+    return render(request, 'core/reports.html', {
+        'material_report': material_report,
+        'salary_report': salary_report,
+    })

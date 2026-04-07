@@ -1,0 +1,50 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h2>Аналітичні звіти</h2>
+
+<h4>Топ матеріалів за використанням</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Матеріал</th>
+            <th>Одиниця</th>
+            <th>Кількість</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in material_report %}
+        <tr>
+            <td>{{ row.name }}</td>
+            <td>{{ row.unit }}</td>
+            <td>{{ row.total_qty }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">Даних немає</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h4>Зарплати по бригадах</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Бригада</th>
+            <th>Сума зарплат</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in salary_report %}
+        <tr>
+            <td>{{ row.brigade_name }}</td>
+            <td>{{ row.total_salary }} грн</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2">Даних немає</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
