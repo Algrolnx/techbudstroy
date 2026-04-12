@@ -1,7 +1,9 @@
+from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, F
 from django.db.models.functions import TruncMonth, TruncWeek, TruncDay
+from django.http import HttpResponse
+import csv
 from .models import (
     ConstructionObject, Material,
     Employee, Contract, Payment, Brigade, MaterialUsage
@@ -62,11 +64,13 @@ def dashboard(request):
     return render(request, 'core/dashboard.html', context)
 
 @login_required
+@permission_required('core.view_constructionobject', raise_exception=True)
 def object_list(request):
     objects = ConstructionObject.objects.select_related('client').all()
     return render(request, 'core/object_list.html', {'objects': objects})
 
 @login_required
+@permission_required('core.view_constructionobject', raise_exception=True)
 def object_detail(request, pk):
     queryset = ConstructionObject.objects.prefetch_related(
         'constructionstage_set', 
@@ -77,11 +81,13 @@ def object_detail(request, pk):
     return render(request, 'core/object_detail.html', {'object': obj})
 
 @login_required
+@permission_required('core.view_material', raise_exception=True)
 def material_list(request):
     materials = Material.objects.all()
     return render(request, 'core/material_list.html', {'materials': materials})
 
 @login_required
+@permission_required('core.view_employee', raise_exception=True)
 def employee_list(request):
     brigade_id = request.GET.get('brigade')
     if brigade_id:
@@ -101,11 +107,13 @@ def employee_list(request):
     return render(request, 'core/employee_list.html', context)
 
 @login_required
+@permission_required('core.view_contract', raise_exception=True)
 def contract_list(request):
     contracts = Contract.objects.select_related('client', 'construction_object').all()
     return render(request, 'core/contract_list.html', {'contracts': contracts})
 
 @login_required
+@permission_required('core.view_materialusage', raise_exception=True)
 def reports(request):
     material_report = (
         MaterialUsage.objects
@@ -113,14 +121,53 @@ def reports(request):
         .annotate(total_qty=Sum('quantity'))
         .order_by('-total_qty')[:10]
     )
-    from .models import Brigade
     salary_report = (
         Employee.objects
         .values(brigade_name=F('brigade__name'))
         .annotate(total_salary=Sum('salary'))
         .order_by('-total_salary')
     )
+    
     return render(request, 'core/reports.html', {
         'material_report': material_report,
         'salary_report': salary_report,
     })
+
+@login_required
+@permission_required('core.view_materialusage', raise_exception=True)
+def export_reports_excel(request):
+    import openpyxl
+
+    wb = openpyxl.Workbook()
+
+    # Аркуш 1: Матеріали
+    ws1 = wb.active
+    ws1.title = 'Матеріали'
+    ws1.append(['Матеріал', 'Одиниця', 'Кількість'])
+    material_report = (
+        MaterialUsage.objects
+        .values(name=F('material__name'), unit=F('material__unit'))
+        .annotate(total_qty=Sum('quantity'))
+        .order_by('-total_qty')[:10]
+    )
+    for row in material_report:
+        ws1.append([row['name'], row['unit'], float(row['total_qty'])])
+
+    # Аркуш 2: Зарплати по бригадах
+    ws2 = wb.create_sheet('Зарплати по бригадах')
+    ws2.append(['Бригада', 'Сума зарплат (грн)'])
+    salary_report = (
+        Employee.objects
+        .values(brigade_name=F('brigade__name'))
+        .annotate(total_salary=Sum('salary'))
+        .order_by('-total_salary')
+    )
+    for row in salary_report:
+        ws2.append([row['brigade_name'], float(row['total_salary'])])
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename="techbudstroy_reports.xlsx"'
+    wb.save(response)
+    return response
