@@ -4,6 +4,8 @@ from django.db.models import Sum, F
 from django.db.models.functions import TruncMonth, TruncWeek, TruncDay
 from django.http import HttpResponse
 import csv
+from django.db import transaction
+from django.utils import timezone
 from .models import (
     ConstructionObject, Material,
     Employee, Contract, Payment, Brigade, MaterialUsage
@@ -171,3 +173,28 @@ def export_reports_excel(request):
     response['Content-Disposition'] = 'attachment; filename="techbudstroy_reports.xlsx"'
     wb.save(response)
     return response
+
+@login_required
+@permission_required('core.add_payment', raise_exception=True)
+def process_payment(request, contract_id):
+    if request.method == 'POST':
+        amount = request.POST.get('amount')
+        try:
+            with transaction.atomic():
+                contract = Contract.objects.select_for_update().get(id=contract_id)
+                Payment.objects.create(
+                    payment_type='IN',
+                    amount=amount,
+                    payment_date=timezone.now().date(),
+                    contract=contract
+                )
+                
+                total_paid = Payment.objects.filter(contract=contract).aggregate(Sum('amount'))['amount__sum'] or 0
+                if total_paid >= contract.total_amount:
+                    contract.status = 'Completed'
+                    contract.save()
+                    
+            return HttpResponse("Оплату успішно проведено (Транзакція завершена)")
+        except Exception as e:
+            return HttpResponse(f"Помилка транзакції: {str(e)}", status=400)
+    return HttpResponse("Тільки POST", status=400)

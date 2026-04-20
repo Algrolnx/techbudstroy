@@ -2,7 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Company(models.Model):
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150, db_index=True)
     edrpou = models.CharField(max_length=10, unique=True)
     address = models.CharField(max_length=225, blank=True, null=True)
     director = models.CharField(max_length=100, blank=True, null=True)
@@ -31,7 +31,7 @@ class Employee(models.Model):
         return self.full_name
 
 class Client(models.Model):
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150, db_index=True)
     tax = models.CharField(max_length=12, unique=True)
     address = models.CharField(max_length=225)
 
@@ -51,7 +51,7 @@ class ConstructionObject(models.Model):
 class Contract(models.Model):
     contract_number = models.CharField(max_length=50, unique=True)
     total_amount = models.DecimalField(max_digits=15, decimal_places=2)
-    status = models.CharField(max_length=20, default='Active')
+    status = models.CharField(max_length=20, default='Active', db_index=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     construction_object = models.ForeignKey(ConstructionObject, on_delete=models.CASCADE)
 
@@ -104,7 +104,7 @@ class Payment(models.Model):
     PAYMENT_TYPES = [('IN', 'Надходження'), ('OUT', 'Видаток')]
     payment_type = models.CharField(max_length=3, choices=PAYMENT_TYPES)
     amount = models.DecimalField(max_digits=15, decimal_places=2)
-    payment_date = models.DateField()
+    payment_date = models.DateField(db_index=True)
     contract = models.ForeignKey(Contract, on_delete=models.CASCADE )
 
     def __str__(self):
